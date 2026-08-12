@@ -1,0 +1,137 @@
+Kabinet2#show running-config
+!
+hostname Kabinet2
+!
+logging console 6
+logging monitor 6
+logging trap 6
+!
+spanning-tree mode rstp
+telnet-server enable
+ssh-server enable
+web-server enable http
+username admin privilege 15 password 5 $1$nVoAuam0$w6SQ9Bbxrx4R.8q6JOJrL.
+clock timezone Istanbul
+logging web buffer 100
+lldp run
+!
+vlan database
+ vlan 2-4  state enable
+!
+interface gigabitEthernet0/1
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/2
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/3
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/4
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/5
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/6
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/7
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/8
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/9
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/10
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/11
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/12
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/13
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/14
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/15
+ switchport mode trunk
+ loop-detect enable
+!
+interface gigabitEthernet0/16
+ switchport mode trunk
+ loop-detect enable
+!
+interface gigabitEthernet0/17
+ switchport mode trunk
+ loop-detect enable
+!
+interface gigabitEthernet0/18
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/19
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/20
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/21
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/22
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/23
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/24
+ shutdown
+ loop-detect enable
+!
+interface tengigabitEthernet0/25
+ switchport mode trunk
+!
+interface tengigabitEthernet0/26
+ switchport mode trunk
+!
+interface tengigabitEthernet0/27
+ switchport mode trunk
+!
+interface tengigabitEthernet0/28
+ switchport mode trunk
+!
+interface vlan1
+ ip address dhcp
+!
+line con 0
+line vty 0 7
+!
+end
+
+Kabinet2#

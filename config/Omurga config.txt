@@ -1,0 +1,590 @@
+
+
+OMURGA>
+OMURGA>enable
+OMURGA#show running-config
+Current configuration:
+!
+!
+!
+logging on
+!
+!
+hostname OMURGA
+!
+!
+!
+!
+!
+!
+!
+!
+!
+lldp run
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode rstp
+spanning-tree bpdu-terminal
+spanning-tree loopguard default
+spanning-tree rstp priority 8192
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+aaa authentication login default local
+aaa authentication sshd default local
+!
+!
+username admin password 0 [REDACTED — bkz. investigation.md CASE-006, düz metin parola bulgusu]
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface p1
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface p2
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface p3
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface p4
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface p5
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface p6
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface p7
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface p8
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface g0/0/0
+ ip address 192.168.1.1 255.255.255.0
+!
+!!chassis 1 4513
+!
+!!chassis 1 slot 0 1291
+!
+interface tg1/0/1
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface tg1/0/2
+ aggregator-group 2 mode lacp
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface tg1/0/3
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface tg1/0/4
+ aggregator-group 4 mode lacp
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface tg1/0/5
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface tg1/0/6
+ aggregator-group 6 mode lacp
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface tg1/0/7
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface tg1/0/8
+ aggregator-group 8 mode lacp
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface tg1/0/9
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface tg1/0/10
+ fiber-auto enable
+ ddm enable
+!
+interface tg1/0/11
+ fiber-auto enable
+ ddm enable
+!
+interface tg1/0/12
+ fiber-auto enable
+ ddm enable
+!
+interface tg1/0/13
+ fiber-auto enable
+ ddm enable
+!
+interface tg1/0/14
+ fiber-auto enable
+ ddm enable
+!
+interface tg1/0/15
+ fiber-auto enable
+ ddm enable
+!
+interface tg1/0/16
+ fiber-auto enable
+ ddm enable
+!
+interface tg1/0/17
+ fiber-auto enable
+ ddm enable
+!
+interface tg1/0/18
+ fiber-auto enable
+ ddm enable
+!
+interface tg1/0/19
+ fiber-auto enable
+ ddm enable
+!
+interface tg1/0/20
+ fiber-auto enable
+ ddm enable
+!
+interface tg1/0/21
+ fiber-auto enable
+ ddm enable
+!
+interface tg1/0/22
+ fiber-auto enable
+ ddm enable
+!
+interface cg1/0/1
+ fiber-auto enable
+ ddm enable
+!
+interface cg1/0/2
+ fiber-auto enable
+ ddm enable
+!
+!!chassis 1 slot 0 end
+!
+!!chassis 1 end
+!
+!!chassis 2 4513
+!
+!!chassis 2 slot 0 1291
+!
+interface tg2/0/1
+ aggregator-group 1 mode lacp
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 2-4
+ switchport mode trunk
+!
+interface tg2/0/2
+ aggregator-group 2 mode lacp
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface tg2/0/3
+ aggregator-group 3 mode lacp
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 2-4
+ switchport mode trunk
+!
+interface tg2/0/4
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface tg2/0/5
+ aggregator-group 5 mode lacp
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 2-4
+ switchport mode trunk
+!
+interface tg2/0/6
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface tg2/0/7
+ aggregator-group 7 mode lacp
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 2-4
+ switchport mode trunk
+!
+interface tg2/0/8
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface tg2/0/9
+ fiber-auto enable
+ ddm enable
+!
+interface tg2/0/10
+ fiber-auto enable
+ ddm enable
+ switchport trunk vlan-allowed 1-4
+ switchport mode trunk
+!
+interface tg2/0/11
+ fiber-auto enable
+ ddm enable
+!
+interface tg2/0/12
+ fiber-auto enable
+ ddm enable
+!
+interface tg2/0/13
+ fiber-auto enable
+ ddm enable
+!
+interface tg2/0/14
+ fiber-auto enable
+ ddm enable
+!
+interface tg2/0/15
+ fiber-auto enable
+ ddm enable
+!
+interface tg2/0/16
+ fiber-auto enable
+ ddm enable
+!
+interface tg2/0/17
+ fiber-auto enable
+ ddm enable
+!
+interface tg2/0/18
+ fiber-auto enable
+ ddm enable
+!
+interface tg2/0/19
+ fiber-auto enable
+ ddm enable
+!
+interface tg2/0/20
+ fiber-auto enable
+ ddm enable
+!
+interface tg2/0/21
+ fiber-auto enable
+ ddm enable
+!
+interface tg2/0/22
+ fiber-auto enable
+ ddm enable
+!
+interface cg2/0/1
+ fiber-auto enable
+ ddm enable
+!
+interface cg2/0/2
+ fiber-auto enable
+ ddm enable
+!
+!!chassis 2 slot 0 end
+!
+!!chassis 2 end
+!
+interface vlan1
+ ip address 10.64.0.6 255.255.255.0
+!
+interface vlan2
+ ip address 10.64.2.6 255.255.255.0
+!
+interface vlan3
+ ip address 10.64.3.6 255.255.255.0
+!
+interface vlan4
+ ip address 10.64.4.6 255.255.255.0
+!
+!
+ip route default 10.64.0.1
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+vlan 1-4
+!
+!
+!
+!
+!
+ loopback-detection
+!
+!
+!
+ip sshd enable
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip http server
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!Pending configurations:
+!
+!
+!!chassis 0 1291
+!
+!
+!!chassis 0 slot 0 1291
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface tg0/0/1
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/2
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/3
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/4
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/5
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/6
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/7
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/8
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/9
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/10
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/11
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/12
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/13
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/14
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/15
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/16
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/17
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/18
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/19
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/20
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/21
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/22
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/23
+ fiber-auto enable
+ ddm enable
+!
+interface tg0/0/24
+ fiber-auto enable
+ ddm enable
+!
+interface cg0/0/1
+ fiber-auto enable
+ ddm enable
+!
+interface cg0/0/2
+ fiber-auto enable
+ ddm enable
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!!chassis 0 slot 0 end
+!
+!
+!!chassis 0 end
+!
+
+OMURGA#

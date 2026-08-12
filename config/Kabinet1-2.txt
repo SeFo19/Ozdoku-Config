@@ -1,0 +1,264 @@
+Kabinet1-2#show running-config
+!
+hostname Kabinet1-2
+!
+logging console 6
+logging monitor 6
+logging trap 6
+!
+spanning-tree mode rstp
+telnet-server enable
+ssh-server enable
+web-server enable http
+username admin privilege 15 password 5 $1$dV7Dl331$J9znH42QPWoGuUiVxcHt.0
+clock timezone Istanbul
+lldp run
+!
+vlan database
+ vlan 2-4  state enable
+!
+interface gigabitEthernet0/1
+ description Dokuma 1 - 10.64.3.22
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/2
+ description Dokuma 2 - 10.64.3.23
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/3
+ description Dokuma 3 - 10.64.3.24
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/4
+ description Dokuma 4 - 10.64.3.25
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/5
+ description Dokuma 5 - 10.64.3.26
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/6
+ description Dokuma 6 - 10.64.3.27
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/7
+ description Dokuma 7 - 10.64.3.28
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/8
+ description Dokuma 8 - 10.64.3.29
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/9
+ description Dokuma 9 - 10.64.3.30
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/10
+ description Dokuma 10 - 10.64.3.31
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/11
+ description Dokuma 11 - 10.64.3.32
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/12
+ description Dokuma 12 - 10.64.3.33
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/13
+ description Dokuma 13 - 10.64.3.34
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/14
+ description Dokuma 14 - 10.64.3.35
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/15
+ description Dokuma 15 - 10.64.3.36
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/16
+ description Dokuma 16 - 10.64.3.37
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/17
+ description Dokuma 17 - 10.64.3.38
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/18
+ description Dokuma 18 - 10.64.3.39
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/19
+ description Dokuma 19 - 10.64.3.40
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/20
+ description Dokuma 20 - 10.64.3.41
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/21
+ description Dokuma 21 - 10.64.3.42
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/22
+ description Dokuma 22 - 10.64.3.43
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/23
+ description Dokuma 23 - 10.64.3.44
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/24
+ description Dokuma 24 - 10.64.3.45
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/25
+ description Dokuma 25 - 10.64.3.46
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/26
+ description Dokuma 26 - 10.64.3.47
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/27
+ description Dokuma 27 - 10.64.3.48
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/28
+ description Dokuma 28 - 10.64.3.49
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/29
+ description Dokuma 29 - 10.64.3.50
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/30
+ description Dokuma 30 - 10.64.3.51
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/31
+ description Dokuma 31 - 10.64.3.52
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/32
+ description Dokuma 32 - 10.64.3.53
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/33
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/34
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/35
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/36
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/37
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/38
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/39
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/40
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/41
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/42
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/43
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/44
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/45
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/46
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/47
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/48
+ switchport access vlan 3
+ loop-detect enable
+!
+interface tengigabitEthernet0/49
+ switchport mode trunk
+!
+interface tengigabitEthernet0/50
+ switchport mode trunk
+!
+interface tengigabitEthernet0/51
+ switchport mode trunk
+!
+interface tengigabitEthernet0/52
+ switchport mode trunk
+!
+interface vlan1
+ ip address dhcp
+!
+line con 0
+line vty 0 7
+!
+end
+
+Kabinet1-2#

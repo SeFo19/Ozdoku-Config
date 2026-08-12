@@ -1,0 +1,227 @@
+Yonetim_Alt#show running-config
+!
+hostname Yonetim_Alt
+!
+logging console 6
+logging monitor 6
+logging trap 6
+!
+spanning-tree mode rstp
+telnet-server enable
+ssh-server enable
+web-server enable http
+username admin privilege 15 password 5 $1$dV7DhIe1$F3aVXh7sS7mAgyPO3yJ7i1
+clock timezone Istanbul
+logging web buffer 200
+lldp run
+loop-detect enable
+!
+vlan database
+ vlan 2-4  state enable
+!
+interface gigabitEthernet0/1
+ shutdown
+ switchport mode trunk
+ loop-detect enable
+!
+interface gigabitEthernet0/2
+ description NVR
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/3
+ loop-detect enable
+!
+interface gigabitEthernet0/4
+ loop-detect enable
+!
+interface gigabitEthernet0/5
+ loop-detect enable
+!
+interface gigabitEthernet0/6
+ loop-detect enable
+!
+interface gigabitEthernet0/7
+ loop-detect enable
+!
+interface gigabitEthernet0/8
+ loop-detect enable
+!
+interface gigabitEthernet0/9
+ description PC
+ loop-detect enable
+!
+interface gigabitEthernet0/10
+ description Kamera
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/11
+ loop-detect enable
+!
+interface gigabitEthernet0/12
+ loop-detect enable
+!
+interface gigabitEthernet0/13
+ loop-detect enable
+!
+interface gigabitEthernet0/14
+ shutdown
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/15
+ loop-detect enable
+!
+interface gigabitEthernet0/16
+ description Sistem odası alttaki PC takılı
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/17
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/18
+ switchport access vlan 4
+ loop-detect enable
+!
+interface gigabitEthernet0/19
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/20
+ loop-detect enable
+!
+interface gigabitEthernet0/21
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/22
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/23
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/24
+ loop-detect enable
+!
+interface gigabitEthernet0/25
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/26
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/27
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/28
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/29
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/30
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/31
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/32
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/33
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/34
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/35
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/36
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/37
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/38
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/39
+ switchport access vlan 3
+ loop-detect enable
+!
+interface gigabitEthernet0/40
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/41
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/42
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/43
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/44
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/45
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/46
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/47
+ shutdown
+ loop-detect enable
+!
+interface gigabitEthernet0/48
+ switchport mode trunk
+ loop-detect enable
+!
+interface tengigabitEthernet0/49
+ switchport mode trunk
+!
+interface tengigabitEthernet0/50
+ switchport mode trunk
+!
+interface tengigabitEthernet0/51
+ switchport mode trunk
+!
+interface tengigabitEthernet0/52
+ switchport mode trunk
+!
+interface vlan1
+ ip address dhcp
+!
+line con 0
+line vty 0 7
+!
+end
+
+Yonetim_Alt#
