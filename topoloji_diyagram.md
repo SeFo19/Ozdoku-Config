@@ -2,11 +2,17 @@
 
 Bu diyagram `usak_topoloji.md` ve `config/` altındaki cihaz konfigürasyonlarından, ayrıca `investigation.md`'deki canlı SSH bulgularından derlenmiştir. Sorunlu bağlantılar (CASE-007) kırmızı ile işaretlenmiştir.
 
-**Son güncelleme:** 2026-08-13 — 🚨 **Kök neden Omurga DEĞİL.** Bu diyagram `investigation.md` ile birlikte güncel tutulmalıdır; investigation dosyasında yeni case/bulgu eklendikçe burası da güncellenmeli.
+**Son güncelleme:** 2026-08-13 — 🚨 **Kök neden Omurga DEĞİL, SFP de DEĞİL.** Bu diyagram `investigation.md` ile birlikte güncel tutulmalıdır; investigation dosyasında yeni case/bulgu eklendikçe burası da güncellenmeli.
 
-🚨🚨🚨 **2026-08-13 KRİTİK SONUÇ:** Müşteri, aynı SFP modülü + aynı (değişmeyen) fiber patch kablosuyla bağlantıyı sırayla taşıdı: `tg1/0/5` (chassis 1) → `tg1/0/9` (chassis 1) → `tg2/0/12` (**chassis 2**). **Üçünde de aynı kronik flap sorunu devam etti.** Bu, sorunun **Omurga'nın herhangi bir port/chassis'inden kaynaklanmadığını** kanıtlıyor. Kalan şüpheliler: taşınan SFP modülünün kendisi (SN: ANW22071402084), fiber patch kablosu, veya Kabinet3 tarafı (port 26). Detay: `investigation.md` CASE-007.
+## 🔖 TL;DR
 
-✅ **~13:53 güncelleme:** Kullanıcı `tg2/0/12`'ye trunk config ekledi, fiziksel bağlantı da düzelmiş görünüyor (LOS yok, RX gücü normal, ~9 dk flap yok). **Henüz kalıcı olduğu teyit edilmedi**, izleniyor.
+- Kabinet3'ün Omurga bağlantısı (aynı SFP + aynı kablo) sırayla 3 farklı Omurga portuna taşındı (tg1/0/5 → tg1/0/9 → tg2/0/12, 2 farklı chassis) — **hepsinde aynı kronik flap sorunu.** → **Omurga ekarte edildi.**
+- Sonra hem Omurga hem Kabinet3 tarafında **yeni/sıfır SFP** takıldı — **sorun yine de devam etti.** → **SFP modülleri de ekarte edildi.**
+- **Kalan şüpheliler:** fiber patch kablosu (hiç değişmedi) ve/veya Kabinet3'ün kendisi.
+- Sıcaklık kontrol edildi, anomali yok (ama sadece anlık veri, gerçek trend yok).
+- Kabinet1-2 tarafı (`tg1/0/3`) ayrı, hâlâ çözülmemiş bir sorun — bu testlerin kapsamı dışında.
+
+Detay: `investigation.md` — Bölüm 5, CASE-007.
 
 ---
 
@@ -19,7 +25,7 @@ graph TB
     subgraph OMURGA["OMURGA Switch (Stack) — 10.64.0.6 — ✅ artık şüpheli değil"]
         direction LR
         C1["Chassis 1<br/>🔴 tg1/0/3 (Kabinet1-2) kronik flap<br/>⚪ tg1/0/5, tg1/0/9 artık boş"]
-        C2["Chassis 2<br/>✅ Kabinet1-1/2/YA temiz<br/>🔴 tg2/0/12 de flap ediyor!"]
+        C2["Chassis 2<br/>✅ Kabinet1-1/2/YA temiz<br/>🔴 tg2/0/12 de flap ediyor (SFP'den bağımsız)"]
     end
 
     FW <-->|"LACP agg2<br/>tg1/0/2 + tg2/0/2"| OMURGA
@@ -33,7 +39,7 @@ graph TB
     C2 -->|"tg2/0/4 ✅<br/>13+ gündür neredeyse<br/>tamamen temiz"| YA["Yonetim_ALT — 10.64.0.75<br/>port 52 trunk uplink"]
 
     K12 --> D1["Dokuma 1-32<br/>(48 port, VLAN3)"]
-    K3 --> D2["VLAN4 cihazları<br/>(24 port, çoğu shutdown)<br/>⚠️ ŞÜPHELİ: SFP/kablo/switch"]
+    K3 --> D2["VLAN4 cihazları<br/>(24 port, çoğu shutdown)<br/>⚠️ ŞÜPHELİ: fiber kablosu/Kabinet3 tarafı<br/>(SFP ekarte edildi)"]
     K11 --> D3["VLAN4 + VLAN2 trunk<br/>downlink'ler (48 port)"]
     K2 --> D4["VLAN4 cihazları<br/>(24 port)"]
     YA --> D5["NVR, Kamera, PC<br/>VLAN2/3/4 karışık<br/>(48 port)"]
@@ -74,7 +80,7 @@ Tüm VLAN'lar Omurga üzerinden L2 trunk ile firewall'a taşınıyor; DHCP gatew
 | Kabinet1-1 | 10.64.0.24 | 49 | tg2/0/10 | 2 | ✅ Temiz (canlı doğrulandı) — bugün ~18:43 açıklanmamış coldstart, 1 izole flap'e sebep oldu |
 | Kabinet1-2 | 10.64.0.22 | 49 | tg1/0/3 | **1** | 🔴 Kronik flap — CASE-007, hâlâ aktif (2026-08-13'te tekrar kontrol edilmedi) |
 | Kabinet2 | 10.64.0.55 | 25 | tg2/0/8 | 2 | ✅ Temiz (canlı doğrulandı) — geçmişte (~12 gün önce) 387 flap olayı, artık aktif değil |
-| Kabinet3 | 10.64.0.28 | ~~25~~ **26 (2026-08-13'te taşındı)** | ~~tg1/0/5~~ ~~tg1/0/9~~ **tg2/0/12 (chassis 2!)** | ~~1~~ **2** | 🔴 Sorun 3 farklı Omurga portunda/2 chassis'te devam etti — **Omurga kaynaklı değil**, SFP/kablo/Kabinet3 tarafı şüpheli |
+| Kabinet3 | 10.64.0.28 | ~~25~~ **26 (2026-08-13'te taşındı)** | ~~tg1/0/5~~ ~~tg1/0/9~~ **tg2/0/12 (chassis 2!)** | ~~1~~ **2** | 🔴 Sorun 3 farklı Omurga portunda/2 chassis'te, hatta yeni SFP'lerle bile devam etti — **Omurga ve SFP ekarte edildi**, fiber kablosu/Kabinet3 tarafı şüpheli |
 | Yonetim_ALT | 10.64.0.75 | 52 | tg2/0/4 | 2 | ✅ Temiz (canlı doğrulandı) — 30 Temmuz'da 1 izole flap, sonrasında temiz |
 | Omurga (stack) | 10.64.0.6 | tg1/0/2 + tg2/0/2 (LACP) | Firewall | 1+2 | ✅ Normal |
 
@@ -94,19 +100,30 @@ graph LR
         C["tg2/0/10<br/>1 izole flap (bugün, reboot)"]
         D["tg2/0/8<br/>geçmişte flap, ~12 gündür temiz"]
         E["tg2/0/4<br/>1 izole flap (30 Tem), sonra temiz"]
-        G["tg2/0/12 🚨<br/>YENİ — Kabinet3 testi burada<br/>62 flap / 9.5 dk — AYNI SORUN!"]
+        G["tg2/0/12 🚨<br/>Kabinet3 testi burada<br/>(eski SFP: 62 flap/9.5dk)<br/>(yeni SFP: sorun devam etti)"]
+    end
+    subgraph "Elenen / Kalan Şüpheliler"
+        direction TB
+        H["✅ Omurga (chassis 1, chassis 2,<br/>3 farklı port) — EKARTE"]
+        I["✅ SFP modülleri<br/>(eski + yeni, iki uçta) — EKARTE"]
+        J["❓ Fiber patch kablosu<br/>— HİÇ DEĞİŞMEDİ, ŞÜPHELİ"]
+        K["❓ Kabinet3 tarafı<br/>(switch/port) — İZOLE EDİLMEDİ"]
     end
 
     classDef problem fill:#ff6b6b,stroke:#a30000,color:#fff
     classDef ok fill:#d3f9d8,stroke:#2b8a3e,color:#000
     classDef unused fill:#e9ecef,stroke:#868e96,color:#666
+    classDef cleared fill:#d3f9d8,stroke:#2b8a3e,color:#000
+    classDef suspect fill:#ffd8a8,stroke:#e8590c,color:#000,stroke-width:2px
 
     class A,G problem
     class B unused
     class C,D,E ok
+    class H,I cleared
+    class J,K suspect
 ```
 
-**🚨 Kesin sonuç (2026-08-13):** Kabinet3 bağlantısı (aynı SFP + aynı kablo) sırayla `tg1/0/5` → `tg1/0/9` (chassis 1) → `tg2/0/12` (**chassis 2**) taşındı, **üçünde de aynı flap sorunu devam etti**. Bu, kök nedenin **Omurga'da değil**, taşınan SFP modülünde, fiber kablosunda veya Kabinet3 tarafında olduğunu kanıtlıyor. (Not: `tg1/0/3`/Kabinet1-2 sorunu bu testten bağımsız, hâlâ çözülmemiş, ayrı bir konu.)
+**🚨 Kesin sonuç (2026-08-13):** Kabinet3 bağlantısı (aynı SFP + aynı kablo) sırayla `tg1/0/5` → `tg1/0/9` (chassis 1) → `tg2/0/12` (**chassis 2**) taşındı, **üçünde de aynı flap sorunu devam etti** → Omurga ekarte edildi. Sonra hem Omurga hem Kabinet3 tarafında **yeni/sıfır SFP takıldı, sorun yine devam etti** → SFP modülleri de ekarte edildi. **Kalan şüpheliler: fiber patch kablosu (hiç değişmedi) ve Kabinet3 tarafı (hiç izole edilmedi).** (Not: `tg1/0/3`/Kabinet1-2 sorunu bu testten bağımsız, hâlâ çözülmemiş, ayrı bir konu.)
 
 **CASE-010 (güvenlik, ayrı konu):** Kabinet2↔Kabinet3 ve Kabinet1-1↔Yonetim_ALT ikişerli gruplar halinde birebir aynı SSH host key'i paylaşıyor — muhtemelen fabrika varsayılanı anahtar, MITM riski.
 

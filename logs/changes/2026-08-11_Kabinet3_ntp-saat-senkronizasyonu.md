@@ -1,4 +1,8 @@
 # Değişiklik Özeti — Kabinet3
+
+## 🔖 TL;DR
+Kabinet3'ün saati NTP olmadığı için 1970'e sıfırlanmıştı. `ntp server 162.159.200.1` eklendi, ~75 saniyede doğru tarihe senkron oldu. Kullanıcı onayıyla yapıldı, kalıcı (startup-config'e kaydedildi).
+
 - **Tarih/Saat:** 2026-08-11 ~20:09 TRT
 - **Cihaz:** Kabinet3 (10.64.0.28)
 - **İlgili oturum log'u:** `logs/2026-08-11/Kabinet3_200500.md`

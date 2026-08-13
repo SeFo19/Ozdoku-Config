@@ -1,5 +1,8 @@
 # Değişiklik Özeti — Kabinet3 ↔ Omurga (fiziksel müdahale)
 
+## 🔖 TL;DR
+Kabinet3'ün Omurga bağlantısı SFP değişimi sırasında port 25'ten 26'ya (Kabinet3 tarafı) taşındı, Omurga tarafında da farklı bir porta (`tg1/0/9`) geçti. Kronik flap sorunu port değişikliğiyle düzelmedi, aynı bağlantıyı takip etti. Sonraki gelişmeler (chassis 2'ye taşıma, SFP değişimi) için `investigation.md` CASE-007'ye bakın — bu dosya sadece 2026-08-13 sabahki ilk SFP/port değişimini kapsıyor.
+
 - **Tarih/Saat:** 2026-08-13, ~09:22 - 09:29 TRT (Kabinet3 tarafı), saat aralığı Omurga tarafı için netleşmedi
 - **Cihazlar:** Kabinet3 (10.64.0.28), Omurga (10.64.0.6)
 - **Kim yaptı:** **Müşteri/kullanıcı — sahada fiziksel müdahale** (SFP modül değişimi, fiber/port taşıma). Bu, AI ajanı (Claude Code) tarafından SSH üzerinden yapılan bir config değişikliği DEĞİLDİR — ajan sadece sonucu salt-okuma komutlarla doğrulayıp bu kaydı oluşturdu.

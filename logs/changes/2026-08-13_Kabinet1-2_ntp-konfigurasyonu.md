@@ -1,4 +1,8 @@
 # Değişiklik Özeti — Kabinet1-2
+
+## 🔖 TL;DR
+Kabinet1-2'nin saati NTP olmadan zaten doğruydu (CASE-011 gizemi); yine de diğer switch'lerle tutarlılık için `ntp server 162.159.200.1` eklendi, kalıcı hale getirildi. Acil bir arıza düzeltmesi değil, önleyici işlem.
+
 - **Tarih/Saat:** 2026-08-13 ~13:11 TRT
 - **Cihaz:** Kabinet1-2 (10.64.0.22)
 - **İlgili oturum log'u:** `logs/2026-08-13/Kabinet1-2_131000.md`
