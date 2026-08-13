@@ -6,6 +6,8 @@ Bu diyagram `usak_topoloji.md` ve `config/` altındaki cihaz konfigürasyonları
 
 🚨🚨🚨 **2026-08-13 KRİTİK SONUÇ:** Müşteri, aynı SFP modülü + aynı (değişmeyen) fiber patch kablosuyla bağlantıyı sırayla taşıdı: `tg1/0/5` (chassis 1) → `tg1/0/9` (chassis 1) → `tg2/0/12` (**chassis 2**). **Üçünde de aynı kronik flap sorunu devam etti.** Bu, sorunun **Omurga'nın herhangi bir port/chassis'inden kaynaklanmadığını** kanıtlıyor. Kalan şüpheliler: taşınan SFP modülünün kendisi (SN: ANW22071402084), fiber patch kablosu, veya Kabinet3 tarafı (port 26). Detay: `investigation.md` CASE-007.
 
+✅ **~13:53 güncelleme:** Kullanıcı `tg2/0/12`'ye trunk config ekledi, fiziksel bağlantı da düzelmiş görünüyor (LOS yok, RX gücü normal, ~9 dk flap yok). **Henüz kalıcı olduğu teyit edilmedi**, izleniyor.
+
 ---
 
 ## Genel Topoloji
