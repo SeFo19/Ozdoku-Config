@@ -45,12 +45,12 @@ Trafik hacmi/deseni (~20 Mbps, yoğun 1024-1518B paket) Kabinet3'ün downstream 
 ```
 
 ## Sonuç / Yorum
-- **Kullanıcı, Omurga tarafında Kabinet3 fiber'ini `tg1/0/5`'ten farklı bir porta (muhtemelen `tg1/0/9`) taşımış** — kullanıcı bunu SSH oturumunda net teyit edemedi ("emin değilim" dedi), ama trafik hacmi/deseni ve zamanlama `tg1/0/9` olduğunu güçlü şekilde destekliyor. **Kesin teyit için fiziksel port etiketleri kontrol edilmeli.**
+- **✅ Kullanıcı tarafından teyit edildi:** Omurga tarafında Kabinet3 fiber'i `tg1/0/5`'ten `tg1/0/9`'a taşınmış (kesin, varsayım değil). **Fiber patch kablosu değişmedi** — aynı fiziksel kablo, sadece Omurga ucundaki port değişti.
 - `tg1/0/9` config'te önceden trunk (VLAN 1-4) olarak hazır bulunuyordu — bu yüzden yazılım tarafında ek bir config değişikliği gerekmedi (ne Kabinet3 ne Omurga tarafında).
-- **Kritik bulgu: port/SFP değişikliği sorunu ÇÖZMEDİ, sadece taşıdı.** Kabinet3 kendi tarafında (port 26) 23 dakika temiz görünse de, Omurga tarafında yeni kullanılan port (tg1/0/9) aynı kronik flap desenini gösteriyor. Bu, sorunun tek bir SFP veya tek bir Omurga portuna özgü olmadığını, **daha genel bir chassis 1 sorunu** (veya her iki SFP değişiminde de kullanılan ortak bir fiber/patch kablosu) olabileceğini güçlendiriyor.
+- **Kritik bulgu: port/SFP değişikliği sorunu ÇÖZMEDİ, sadece taşıdı.** Kabinet3 kendi tarafında (port 26) 23 dakika temiz görünse de, Omurga tarafında yeni kullanılan port (tg1/0/9) aynı kronik flap desenini gösteriyor. **Aynı kablo, farklı port, aynı sorun** — bu, sorunun tek bir Omurga portuna özgü olmadığını, daha genel bir **chassis 1 sorunu** (veya kablonun kendisi) olabileceğini güçlendiriyor.
 
 ## Rollback / Sonraki Adım
-Bu bir "geri alınacak" config değişikliği değil, fiziksel bir müdahale — rollback planı yok. **Önerilen sonraki adım:** Kullanıcının hangi Omurga portuna fiber'i taktığını kesin olarak teyit etmesi (fiziksel etiket/port kontrolü), ve mümkünse farklı bir fiber/patch kablosu ile test edilmesi (kabloyu da değiştirerek SFP+port+kablo üçlüsünden hangisinin ortak faktör olduğu netleştirilebilir).
+Bu bir "geri alınacak" config değişikliği değil, fiziksel bir müdahale — rollback planı yok. **Planlanan sonraki adım (kullanıcı tarafından):** `tg1/0/9`'daki bağlantı **chassis 2'ye taşınacak** — sorunun chassis'i takip edip etmediğini (chassis 1'e özgü donanım arızası) yoksa kabloyu/Kabinet3 tarafını mı takip ettiğini (chassis'ten bağımsız bir sorun) netleştirecek kritik bir test. Kullanıcı taşıma sonrası hangi porta taşındığını bildirecek.
 
 ## Onay
 - **Otomatik mi onaylandı, manuel mi:** Fiziksel müdahale kullanıcı tarafından bağımsız yapıldı (AI ajanı onayı gerektirmedi, çünkü ajan bu işlemi yapmadı). Ajanın yaptığı tek şey salt-okuma doğrulama.
