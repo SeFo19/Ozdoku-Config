@@ -17,7 +17,7 @@ Elimizdeki veriler: topoloji dokümanı (`usak_topoloji.md`), 6 switch config d�
 
 **🚨 GÜNCEL EN ÖNEMLİ BULGU (2026-08-11, CASE-007):** Omurga'ya canlı bağlanılarak yapılan inceleme, **kenar switch'lerin kendisinde değil, Omurga'nın chassis 1'inde** ortak bir sorun olduğunu kesin olarak doğruladı: Kabinet1-2 (`tg1/0/3`) ve Kabinet3'ün (`tg1/0/5`) Omurga tarafındaki portları, sabah bildirilen olaydan beri **hâlâ aktif olarak, sürekli flap ediyor** (~5.5 saatte ~500'er kez); chassis 2'ye bağlı bir port ise neredeyse hiç etkilenmedi. Güç/fan/sıcaklık normal — kök neden muhtemelen SFP/optik veya donanımsal (line card/ASIC) düzeyde, henüz kesinleşmedi. Detay: Bölüm 5, CASE-007.
 
-**🚨🚨 2026-08-13 GÜNCELLEME — SFP DEĞİŞİMİ SORUNU ÇÖZMEDİ, TAŞIDI:** Müşteri, Omurga ve Kabinet3 taraflarında SFP modüllerini değiştirdi ve Kabinet3 tarafında bağlantıyı port 25'ten port 26'ya taşıdı. Kabinet3 tarafı artık temiz (port 26, 23+ dk flap yok). **Ama Omurga tarafında bağlantı büyük olasılıkla `tg1/0/9`'a taşınmış ve bu port da tg1/0/3/tg1/0/5 ile birebir aynı kronik flap desenini gösteriyor** (300/300 son log kaydı bu portta, hâlâ aktif). **Bu çok önemli bir ipucu: sorun tek bir porta/SFP'ye değil, muhtemelen Omurga chassis 1'in genel bir özelliğine (veya ortak kullanılan bir fiber/patch kablosuna) bağlı.** Detay: Bölüm 5, CASE-007 ve `logs/changes/2026-08-13_Kabinet3-Omurga_sfp-degisimi-ve-port-tasima.md`.
+**🚨🚨🚨 2026-08-13 EN GÜNCEL SONUÇ — KÖK NEDEN OMURGA DEĞİL:** Müşteri, sorunu izole etmek için bağlantıyı sırayla taşıdı: `tg1/0/5` (chassis 1) → `tg1/0/9` (chassis 1, hâlâ flap) → **`tg2/0/12` (chassis 2, hâlâ flap!)**. Aynı SFP modülü (SN: ANW22071402084) ve aynı, değişmeyen fiber patch kablosuyla üç farklı Omurga portunda, iki farklı chassis'te aynı kronik flap sorunu görüldü. **Bu, Omurga'nın (herhangi bir chassis/port) kök neden olma ihtimalini çok zayıflatıyor.** Kalan şüpheliler: taşınan SFP modülünün kendisi, değişmeyen fiber kablosu, veya Kabinet3 tarafı (port 26 SFP'si/kendisi) — henüz test edilmedi. Detay: Bölüm 5, CASE-007.
 
 ---
 
@@ -207,6 +207,23 @@ Müşteri iki adım uyguladı:
 
 **✅ Kullanıcı teyidi (2026-08-13, sonraki mesaj):** `tg1/0/5`'in `tg1/0/9`'a taşındığı kesinleşti (varsayım değil). Fiber patch kablosu **değişmedi** — aynı fiziksel kablo, sadece Omurga ucundaki port değişti; sorun yine de devam etti. Kullanıcının planı: `tg1/0/9`'daki bağlantıyı **chassis 2'ye taşımak** ve sonucu bildirmek — bu, chassis-1-özgü donanım arızası hipotezini kesin olarak test edecek.
 
+### 🚨🚨🚨 2026-08-13 KRİTİK SONUÇ — Sorun chassis 2'de de devam ediyor, kök neden Omurga chassis 1 DEĞİL
+
+Kullanıcı bağlantıyı `tg1/0/9`'dan **`tg2/0/12`'ye** (chassis 2) taşıdı. Canlı doğrulama (~13:37 TRT):
+
+- **`tg2/0/12` (chassis 2) da flap ediyor** — 9.5 dakikalık pencerede (13:27:55-13:37:26) **62 flap olayı**, aynı yoğun/hızlı desen (bazen saniyede birden fazla geçiş).
+- İlk bağlantı denememde `show interface tg2/0/12` **LOS: yes, RX Power: -40.00dBm** (sinyal yok) gösterdi; birkaç dakika sonra port "up" durumuna geçmişti — bu tutarsızlık, bağlantının o an aktif olarak flap ettiğini doğruluyor.
+- Kabinet3'e bağlanmayı ilk denediğimde bağlantı zaman aşımına uğradı, ikinci denemede başarılı oldu (port 26 "up" görünüyordu) — bu da bağlantı kararsızlığıyla tutarlı.
+- **Önemli teknik detay:** `tg2/0/12`, Omurga config'inde **trunk olarak yapılandırılmamış** (sadece `fiber-auto`/`ddm`, `switchport mode trunk` yok) — bu nedenle VLAN2/3/4 trafiği muhtemelen düzgün geçmiyor olabilir (sadece native/access VLAN1 geçebilir). Bu, "flap" bulgusunu geçersiz kılmıyor (LINE/LINEPROTO seviyesinde fiziksel/link katmanı olayı, VLAN config'inden bağımsız) ama VLAN2-4 üzerindeki cihazların bu test sırasında tam çalışmayabileceği anlamına geliyor — henüz trunk config eklenmedi (kullanıcı onayı gerekir).
+- **Ek gözlem:** Taşınan SFP modülü, hem `tg1/0/9`'da hem şimdi `tg2/0/9`'da **aynı seri numarayı** taşıyor (`ANW22071402084`) — yani SFP modülünün kendisi (sadece fiber değil) taşınmış.
+
+**SONUÇ VE HİPOTEZ DEĞİŞİKLİĞİ:** Aynı bağlantı (aynı SFP modülü + aynı, değişmeyen fiber patch kablosu + aynı Kabinet3 ucu) artık **üç farklı Omurga portunda** (tg1/0/5 → tg1/0/9 → tg2/0/12), **hem chassis 1 hem chassis 2'de**, aynı kronik flap sorununu gösterdi. Bu, **Omurga'nın (chassis 1 veya 2, herhangi bir port) kök neden olma ihtimalini çok büyük ölçüde zayıflatıyor.** Kalan en olası şüpheliler:
+1. **Taşınan SFP modülünün kendisi** (ANW22071402084) — arızalı/marjinal olabilir, her nereye takılırsa orada soruna yol açıyor olabilir.
+2. **Değişmeyen fiber patch kablosu** — kullanıcı "değişmedi" dedi, yani hâlâ şüpheli.
+3. **Kabinet3 tarafı (port 26'daki SFP veya Kabinet3'ün kendisi)** — henüz bu taraf hiç değiştirilmedi/izole edilmedi.
+
+**Önerilen sonraki adım:** Omurga tarafında **farklı, bilinen-sağlam bir SFP modülü** ile test edilmesi (aynı port, farklı SFP) — eğer sorun düzelirse SFP suçlu; düzelmezse fiber kablosu veya Kabinet3 tarafı şüpheli hale gelir.
+
 ### CASE-008 — Kabinet3 cihaz saati senkron değildi (NTP yok/çalışmıyordu)
 **Durum:** ✅ Kapatıldı (2026-08-11, Kabinet3 için) — **Bu, kural olarak "cihazlarda değişiklik yapma" ilkesine kullanıcı onayıyla yapılan bir istisnadır.**
 
@@ -278,9 +295,12 @@ Kabinet2 ve Yonetim_ALT'ın saatleri **doğru** (`show clock` gerçek tarih/saat
 - [ ] Kabinet1-1'in bugün ~18:43 civarında (tahmini) yeniden başlamış (coldstart) olması — planlı mıydı, sebebi biliniyor mu? (kullanıcıya soruldu)
 - [ ] Kabinet2 ve Yonetim_ALT'ın saati NTP olmadan nasıl doğru — RTC pili farkı mı? (CASE-011, kullanıcıya soruldu)
 - [ ] SSH host key paylaşımı (CASE-010) — üreticiye sorulmalı, güvenlik riski olarak değerlendirilmeli
-- [ ] **YENİ (2026-08-13):** Kabinet3'ün Omurga tarafındaki yeni bağlantı noktası fiziksel olarak teyit edilmeli (tg1/0/9 mi, başka bir port mu?)
-- [ ] **YENİ:** SFP değişimlerinde fiber/patch kablosu da değiştirildi mi, yoksa aynı kablo mu kullanıldı?
-- [ ] **YENİ:** Kabinet1-2 (`tg1/0/3`) şu anki durumu tekrar kontrol edilmeli — bu turda bakılmadı
+- [x] Kabinet3'ün Omurga tarafındaki yeni bağlantı noktası — kullanıcı `tg1/0/9` olduğunu teyit etti
+- [x] Fiber/patch kablosu değişti mi — kullanıcı **değişmedi** dedi (aynı kablo, farklı port)
+- [ ] Kabinet1-2 (`tg1/0/3`) şu anki durumu tekrar kontrol edilmeli — bu turda bakılmadı
+- [ ] **YENİ (2026-08-13, öncelikli):** Omurga tarafında bilinen-sağlam farklı bir SFP ile test — SFP mi yoksa fiber kablosu/Kabinet3 tarafı mı sorunlu, izole edilmeli
+- [ ] **YENİ:** Kabinet3 tarafındaki port 26 SFP'sinin DDM/optik değerleri kontrol edilmeli (henüz bakılmadı, sadece Omurga tarafı incelendi)
+- [ ] **YENİ:** `tg2/0/12`'ye trunk config eklenmesi gerekiyor mu (VLAN2-4 testleri için) — şu an sadece VLAN1 geçiyor olabilir, kullanıcı onayı gerekir
 - [ ] Kabinet3 (ve diğer switch'ler) için doğru "show interface counters/status/transceiver" komut sözdizimi — bu OS'e özgü, bir sonraki oturumda keşfedilecek (CASE-007)
 - [x] Kabinet3 NTP senkronizasyonu — 2026-08-11 uygulandı ve doğrulandı (CASE-008)
 - [x] Kabinet3'teki NTP değişikliğinin kalıcılığı — kullanıcı kendi `wr` komutuyla startup-config'e kaydetmiş, teyit edildi
@@ -318,3 +338,4 @@ Aşağıdaki adımların hiçbiri config değişikliği içermiyor; SSH erişimi
 | 2026-08-13 | Kabinet1-2'ye ilk kez canlı SSH bağlantısı denendi (saat düzeltmesi talebi üzerine) — bağlantı 3 kez koptu/zaman aşımına uğradı (muhtemelen tg1/0/3'ün o anki aktif flap'i nedeniyle), NTP değişikliği tamamlanamadı. Host key'i Kabinet1-1/Yonetim_ALT ile aynı çıktı (CASE-010'a üçüncü örnek eklendi). |
 | 2026-08-13 | **🚨 Müşteri fiziksel SFP değişimi yaptı:** Omurga tarafında Kabinet3'ün SFP'si değiştirildi (sorun düzelmedi), sonra Kabinet3 tarafında port 25'in SFP'si değiştirilip bağlantı port 26'ya taşındı (~6 dk kesinti sonrası düzeldi). Canlı doğrulama: Kabinet3 tarafı (port 26) artık temiz; ama Omurga tarafında `tg1/0/5` tamamen boşaldı ve bağlantının taşındığı düşünülen `tg1/0/9` portu **aynı kronik flap sorununu göstermeye devam ediyor**. **Sonuç: SFP/port değişimi sorunu çözmedi, Omurga chassis 1 içinde başka bir porta taşıdı** — kök nedenin tek bir SFP/porttan çok, chassis 1'in genelinde veya ortak kullanılan fiber/patch kablosunda olabileceği hipotezi güçlendi. Değişiklik kaydı: `logs/changes/2026-08-13_Kabinet3-Omurga_sfp-degisimi-ve-port-tasima.md`. |
 | 2026-08-13 | Kullanıcı, `tg1/0/9`'un kesinlikle `tg1/0/5`'in taşınmış hali olduğunu ve **fiber patch kablosunun değişmediğini** teyit etti (aynı kablo, farklı port, aynı sorun). Kullanıcının planı: bağlantıyı **chassis 2'ye taşıyıp** sonucu bildirmek — chassis-1-özgü hipotezi için kesin test. Kabinet1-2'ye tekrar bağlanıldı (bu kez sorunsuz) ve saat/NTP tutarlılığı için `ntp server 162.159.200.1` uygulandı ve `wr` ile kalıcı hale getirildi (oturum: `logs/2026-08-13/Kabinet1-2_131000.md`, değişiklik: `logs/changes/2026-08-13_Kabinet1-2_ntp-konfigurasyonu.md`). Kabinet1-2'nin saati de (Kabinet2/Yonetim_ALT gibi) NTP olmadan zaten doğruydu — CASE-011'e üçüncü örnek eklendi. |
+| 2026-08-13 | **🚨🚨🚨 KRİTİK SONUÇ:** Kullanıcı bağlantıyı `tg2/0/12`'ye (chassis 2) taşıdı. Canlı doğrulama: **`tg2/0/12` de flap ediyor** (9.5 dakikada 62 olay, LOS anları dahil) — aynı SFP modülü (SN ANW22071402084) ve değişmeyen fiber kablosu artık üç farklı Omurga portunda, iki farklı chassis'te aynı sorunu gösterdi. **Omurga'nın (herhangi bir chassis/port) kök neden olma ihtimali büyük ölçüde ekarte edildi.** Kalan şüpheliler: taşınan SFP modülünün kendisi, fiber kablosu, veya Kabinet3 tarafı (port 26). Önerilen sonraki adım: Omurga tarafında farklı/sağlam bir SFP ile test. |
