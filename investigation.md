@@ -2,7 +2,7 @@
 
 **Durum:** Açık / Devam ediyor
 **Oluşturulma:** 2026-08-11
-**Son güncelleme:** 2026-08-11
+**Son güncelleme:** 2026-08-13
 **Kural:** Cihazlarda hiçbir konfigürasyon değişikliği yapılmadı/yapılmayacak. Bu doküman sadece gözlem, bulgu, hipotez ve soru takibi için kullanılıyor. Emin olunmayan hiçbir konu "tespit" olarak yazılmıyor, "hipotez" veya "doğrulanması gereken" olarak işaretleniyor.
 
 ---
@@ -16,6 +16,8 @@ Elimizdeki veriler: topoloji dokümanı (`usak_topoloji.md`), 6 switch config d�
 **Ön değerlendirme:** Ping çıktısındaki TTL değerleri ve kesinti anında görülen "TTL expired in transit" mesajları, müşterinin tarif ettiği "ağ tamamen L2 çalışıyor" mimarisiyle çelişen bir bulgu ortaya koyuyor (bkz. CASE-002, CASE-003). Bu, henüz **doğrulanmamış bir hipotez** — teyit için ek bilgi gerekiyor (bkz. Bölüm 6).
 
 **🚨 GÜNCEL EN ÖNEMLİ BULGU (2026-08-11, CASE-007):** Omurga'ya canlı bağlanılarak yapılan inceleme, **kenar switch'lerin kendisinde değil, Omurga'nın chassis 1'inde** ortak bir sorun olduğunu kesin olarak doğruladı: Kabinet1-2 (`tg1/0/3`) ve Kabinet3'ün (`tg1/0/5`) Omurga tarafındaki portları, sabah bildirilen olaydan beri **hâlâ aktif olarak, sürekli flap ediyor** (~5.5 saatte ~500'er kez); chassis 2'ye bağlı bir port ise neredeyse hiç etkilenmedi. Güç/fan/sıcaklık normal — kök neden muhtemelen SFP/optik veya donanımsal (line card/ASIC) düzeyde, henüz kesinleşmedi. Detay: Bölüm 5, CASE-007.
+
+**🚨🚨 2026-08-13 GÜNCELLEME — SFP DEĞİŞİMİ SORUNU ÇÖZMEDİ, TAŞIDI:** Müşteri, Omurga ve Kabinet3 taraflarında SFP modüllerini değiştirdi ve Kabinet3 tarafında bağlantıyı port 25'ten port 26'ya taşıdı. Kabinet3 tarafı artık temiz (port 26, 23+ dk flap yok). **Ama Omurga tarafında bağlantı büyük olasılıkla `tg1/0/9`'a taşınmış ve bu port da tg1/0/3/tg1/0/5 ile birebir aynı kronik flap desenini gösteriyor** (300/300 son log kaydı bu portta, hâlâ aktif). **Bu çok önemli bir ipucu: sorun tek bir porta/SFP'ye değil, muhtemelen Omurga chassis 1'in genel bir özelliğine (veya ortak kullanılan bir fiber/patch kablosuna) bağlı.** Detay: Bölüm 5, CASE-007 ve `logs/changes/2026-08-13_Kabinet3-Omurga_sfp-degisimi-ve-port-tasima.md`.
 
 ---
 
@@ -69,7 +71,7 @@ Ham log ters kronolojik (en yeni üstte) paylaşılmıştı; aşağıda kronoloj
 
 - Kabinet1-2 `tg0/49` trunk ↔ Omurga `tg1/0/3` trunk (vlan-allowed 1-4) — **eşleşiyor**
 - Kabinet1-1 `tg0/49` trunk ↔ Omurga `tg2/0/10` trunk (vlan-allowed 1-4) — **eşleşiyor**
-- Kabinet3 `tg0/25` trunk ↔ Omurga `tg1/0/5` trunk (vlan-allowed 1-4) — **eşleşiyor**
+- Kabinet3 `tg0/25` trunk ↔ Omurga `tg1/0/5` trunk (vlan-allowed 1-4) — **eşleşiyor (orijinal config)** — ⚠️ **2026-08-13'te fiziksel olarak değişti:** müşteri SFP değişimi sırasında Kabinet3 tarafını `tg0/26`'ya taşıdı, Omurga tarafı da muhtemelen `tg1/0/9`'a taşındı (kesin teyit edilmedi). Bkz. CASE-007, 2026-08-13 güncellemesi. **Bu artık güncel/canlı topolojiyi yansıtmıyor, sadece orijinal/başlangıç durumunu gösteriyor.**
 - Yonetim_ALT `tg0/52` trunk ↔ Omurga `tg2/0/4` trunk (vlan-allowed 1-4) — **eşleşiyor**
 - Kabinet2 `tg0/25` trunk ↔ Omurga `tg2/0/8` trunk (vlan-allowed 1-4) — **eşleşiyor**
 - Omurga `tg1/0/2` + `tg2/0/2` → LACP aggregator-group 2 → firewall bağlantısı — topoloji notuyla **eşleşiyor**
@@ -178,8 +180,28 @@ Ayrıca üç switch'in de config'i (`show running-config`) repo'daki kopyalarla 
 
 **Kalan doğrulama adımları:**
 - Kabinet1-2'nin kendi tarafından (henüz canlı bağlanılmadı — sadece web konsol log ekran görüntüsü var) `show logging`/`show interface` ile teyit
-- Fiziksel SFP/kablo değişimi (bu doküman kapsamında **yapılmadı**, fiziksel müdahale ayrıca müşteri onayı gerektirir — önerilir: tg1/0/3 ve tg1/0/5'in SFP'lerini çapraz değiştirip sorunun portu mu takip ediyor SFP'yi mi takip ediyor görülebilir)
+- ~~Fiziksel SFP/kablo değişimi~~ — **2026-08-13'te müşteri tarafından yapıldı, bkz. aşağıdaki alt bölüm**
 - Angora Networks (üretici) ile chassis 1 line card / port grubu için destek talebi açılması düşünülebilir — yazılım/uzaktan teşhisle ulaşılabilecek noktaya gelindi
+
+#### 2026-08-13 Güncellemesi — Fiziksel SFP değişimi ve port taşıma (sorun ÇÖZÜLMEDİ, TAŞINDI)
+
+**Değişiklik kaydı:** `logs/changes/2026-08-13_Kabinet3-Omurga_sfp-degisimi-ve-port-tasima.md` (fiziksel müdahale — müşteri tarafından yapıldı, AI ajanı sadece salt-okuma doğrulama yaptı)
+
+Müşteri iki adım uyguladı:
+1. **Omurga tarafında**, Kabinet3'ün bağlı olduğu SFP değiştirildi (port aynı kaldı) → **sorun düzelmedi, tekrar nüksetti.**
+2. **Kabinet3 tarafında**, port 25'teki SFP değiştirildi ve bağlantı **port 26'ya taşındı** → ~6 dakikalık yoğun geçiş/kesinti sonrası (kullanıcının tarif ettiği "1-2 dakika" ile aynı olay, süre tam örtüşmüyor) **switch erişimi ve ağ geri geldi.**
+
+**Canlı doğrulama sonucu (2026-08-13, ~09:52-12:56 TRT):**
+- ✅ Kabinet3 tarafı: port 25 down/boşta, **port 26 aktif ve 23+ dakikadır tamamen temiz.**
+- ⚠️ Omurga tarafı: `tg1/0/5` (Kabinet3'ün eski bağlantı noktası) **tamamen down**, trafik yok — bağlantı başka bir porta taşınmış.
+- 🚨 **Omurga'da `tg1/0/9` portu (muhtemelen yeni Kabinet3 bağlantı noktası — kesin teyit edilmedi, kullanıcı "emin değilim" dedi) ŞU ANDA, tg1/0/3 ve tg1/0/5 ile BİREBİR AYNI türde kronik/aktif flap yapıyor** (son 300 log kaydının tamamı bu porta ait, 11:42-12:29 TRT aralığında ve devam ediyor). `tg1/0/9`, config'te zaten önceden trunk (VLAN 1-4) olarak hazır bulunuyordu, ek config değişikliği gerekmedi. Trafik hacmi/deseni ve DDM/optik değerleri (normal aralıkta) Kabinet3'ün burada olduğunu destekliyor ama fiziksel port etiketiyle kesin teyit edilmedi.
+
+**Bu, araştırmanın yönünü önemli ölçüde değiştiriyor:** SFP/port değişimi sorunu **çözmedi, sadece Omurga chassis 1 içinde başka bir porta taşıdı**. Bu, "belirli bir SFP veya belirli bir port bozuk" hipotezini zayıflatıp, **"Omurga chassis 1'in kendisinde (güç/ASIC/line card seviyesinde) veya her iki değişimde de ortak kullanılan bir fiber/patch kablosunda" daha genel bir sorun** hipotezini güçlendiriyor.
+
+**Doğrulanması gereken (yeni açık sorular):**
+- Kabinet3'ün Omurga tarafındaki fiber'i hangi porta bağlandı — kesin/fiziksel teyit (etiket kontrolü) gerekiyor, `tg1/0/9` varsayımı henüz kesinleşmedi.
+- SFP değişimlerinde aynı fiber/patch kablosu mu kullanıldı, yoksa farklı bir kablo mu? (Ortak faktörü izole etmek için önemli.)
+- Kabinet1-2 tarafı (`tg1/0/3`) hâlâ flap ediyor mu — bu güncellemede tekrar kontrol edilmedi, CASE-005/CASE-007'nin orijinal konusu.
 
 ### CASE-008 — Kabinet3 cihaz saati senkron değildi (NTP yok/çalışmıyordu)
 **Durum:** ✅ Kapatıldı (2026-08-11, Kabinet3 için) — **Bu, kural olarak "cihazlarda değişiklik yapma" ilkesine kullanıcı onayıyla yapılan bir istisnadır.**
@@ -217,10 +239,10 @@ Diğer switch'lerde (Kabinet1-1, Kabinet1-2, Kabinet3, Yonetim_ALT) kullanıcı 
 | Kabinet2 | `ssh-ed25519 SHA256:QzHtfKQnjI3RXufdaryIa0wxiCZJU/fPrwQDtQXgP/g` ← **Kabinet3 ile birebir aynı** |
 | Kabinet1-1 | `ecdsa-sha2-nistp256 SHA256:GcjQPuCFm6xwSpLlPT5SvMtLBHAVCOuA7LhJjwW1j/0` |
 | Yonetim_ALT | `ecdsa-sha2-nistp256 SHA256:GcjQPuCFm6xwSpLlPT5SvMtLBHAVCOuA7LhJjwW1j/0` ← **Kabinet1-1 ile birebir aynı** |
+| Kabinet1-2 | `ecdsa-sha2-nistp256 SHA256:GcjQPuCFm6xwSpLlPT5SvMtLBHAVCOuA7LhJjwW1j/0` ← **Kabinet1-1 ve Yonetim_ALT ile de birebir aynı** (2026-08-13'te doğrulandı) |
 | Omurga | `ssh-ed25519 SHA256:aY95NpQ8NOmsglHdU6IeGRTs83rfnIgmz9hUjWIJXAw` (farklı) |
-| Kabinet1-2 | Henüz canlı bağlanılmadı, kontrol edilmedi |
 
-Her SSH sunucusunun **benzersiz** bir host key üretmesi beklenir (genelde ilk açılışta cihaz üzerinde otomatik üretilir). İki farklı cihazın **aynı** host key'e sahip olması normal değil — büyük olasılıkla bu switch modelinin firmware imajında **fabrika varsayılanı/sabit kodlanmış bir SSH anahtarı** var ve cihazlar ilk kurulumda kendi benzersiz anahtarlarını üretmiyor. Bu bir **güvenlik zafiyeti**: host key doğrulaması cihaz kimliğini gerçek anlamda doğrulamıyor, aynı modelden bir cihaz (veya bu anahtarı ele geçiren biri) diğerinin yerine geçebilir (MITM riski).
+Her SSH sunucusunun **benzersiz** bir host key üretmesi beklenir (genelde ilk açılışta cihaz üzerinde otomatik üretilir). Farklı cihazların **aynı** host key'e sahip olması normal değil — büyük olasılıkla bu switch modelinin firmware imajında **fabrika varsayılanı/sabit kodlanmış bir SSH anahtarı** var ve cihazlar ilk kurulumda kendi benzersiz anahtarlarını üretmiyor. Not: aynı anahtarı paylaşan 48-port modeller (Kabinet1-1, Kabinet1-2, Yonetim_ALT — hepsi `ANW-2712-48TP4X`) ile 24-port modeller (Kabinet2, Kabinet3 — hepsi `ANW-2712-24TP4X`) kendi aralarında iki ayrı grup oluşturuyor; bu, anahtarın donanım modeline/üretim partisine bağlı olarak sabit kodlanmış olabileceğini düşündürüyor. Bu bir **güvenlik zafiyeti**: host key doğrulaması cihaz kimliğini gerçek anlamda doğrulamıyor, aynı modelden bir cihaz (veya bu anahtarı ele geçiren biri) diğerinin yerine geçebilir (MITM riski).
 **Öneri (aksiyon değil, öneri):** Üreticiye (Angora Networks) bu konu sorulmalı; mümkünse her cihazda host key'in yeniden/benzersiz üretilmesi (genelde `crypto key generate` benzeri bir komutla) sağlanmalı. Bu doküman kapsamında bir değişiklik yapılmadı.
 
 ### CASE-011 — Bazı switch'lerde saat NTP olmadan doğru, sebebi belirsiz
@@ -251,6 +273,9 @@ Kabinet2 ve Yonetim_ALT'ın saatleri **doğru** (`show clock` gerçek tarih/saat
 - [ ] Kabinet1-1'in bugün ~18:43 civarında (tahmini) yeniden başlamış (coldstart) olması — planlı mıydı, sebebi biliniyor mu? (kullanıcıya soruldu)
 - [ ] Kabinet2 ve Yonetim_ALT'ın saati NTP olmadan nasıl doğru — RTC pili farkı mı? (CASE-011, kullanıcıya soruldu)
 - [ ] SSH host key paylaşımı (CASE-010) — üreticiye sorulmalı, güvenlik riski olarak değerlendirilmeli
+- [ ] **YENİ (2026-08-13):** Kabinet3'ün Omurga tarafındaki yeni bağlantı noktası fiziksel olarak teyit edilmeli (tg1/0/9 mi, başka bir port mu?)
+- [ ] **YENİ:** SFP değişimlerinde fiber/patch kablosu da değiştirildi mi, yoksa aynı kablo mu kullanıldı?
+- [ ] **YENİ:** Kabinet1-2 (`tg1/0/3`) şu anki durumu tekrar kontrol edilmeli — bu turda bakılmadı
 - [ ] Kabinet3 (ve diğer switch'ler) için doğru "show interface counters/status/transceiver" komut sözdizimi — bu OS'e özgü, bir sonraki oturumda keşfedilecek (CASE-007)
 - [x] Kabinet3 NTP senkronizasyonu — 2026-08-11 uygulandı ve doğrulandı (CASE-008)
 - [x] Kabinet3'teki NTP değişikliğinin kalıcılığı — kullanıcı kendi `wr` komutuyla startup-config'e kaydetmiş, teyit edildi
@@ -284,3 +309,6 @@ Aşağıdaki adımların hiçbiri config değişikliği içermiyor; SSH erişimi
 | 2026-08-11 | Kullanıcı, `usak_topoloji.md`'deki Omurga IP'sinin yanlış yazıldığını (Kabinet3 ile aynı, 10.64.0.28) fark edip düzeltti (doğrusu: 10.64.0.6). Omurga'ya canlı SSH ile bağlanıldı (salt-okuma, oturum kaydı: `logs/2026-08-11/Omurga_203400.md`). **🚨 CASE-007 kesin olarak doğrulandı:** Omurga'nın kendi logları, chassis 1'e bağlı **hem tg1/0/3 (Kabinet1-2) hem tg1/0/5 (Kabinet3)** portlarının son ~5.5 saattir (15:07'den itibaren, sorgu anı 20:42'de hâlâ devam ediyor) sürekli ve yoğun şekilde flap ettiğini gösterdi (tg1/0/5: ~528, tg1/0/3: ~470 flap döngüsü), buna karşın chassis 2'ye bağlı tg2/0/10 (Kabinet1-1) sadece 1 kez flap etti. Chassis 1/2 güç, fan ve sıcaklık durumu kontrol edildi — hepsi normal, temel donanım arızası değil. Sorun artık kenar switch'lerden değil, **Omurga chassis 1'in kendisinden (SFP/optik, port/ASIC veya line card düzeyinde)** kaynaklanıyor gibi görünüyor — kesin kök neden hâlâ teyit edilmedi. |
 | 2026-08-11 | Kullanıcı sorusu üzerine chassis 1/chassis 2 arası yazılım versiyon uyuşmazlığı ve stack senkronizasyon sorunu ihtimali kontrol edildi (oturum kaydı: `logs/2026-08-11/Omurga_205600.md`). Bu platformda chassis-bazlı versiyon karşılaştırma komutu yok (`show switch/stack/module/inventory/unit/slot` mevcut değil); `show version`/`show kernel-info` tek/birleşik versiyon veriyor. `show oir-information` iki chassis'in de aynı donanım modeli olduğunu doğruladı. ~5.5 saatlik logda versiyon/senkronizasyon anahtar kelimeleri için arama yapıldı, **hiçbir eşleşme yok**. Sonuç: bulgu yok, ama CLI kısıtı nedeniyle %100 dışlanamıyor. |
 | 2026-08-11 | Kullanıcı talebiyle Kabinet1-1, Kabinet2, Yonetim_ALT'a canlı SSH ile bağlanılıp config/saat/log kontrolü yapıldı (oturum kayıtları: `logs/2026-08-11/Kabinet1-1_215000.md`, `Kabinet2_220400.md`, `Yonetim_ALT_224100.md`). **Sonuç: üçünde de config drift yok, üçü de ŞU ANDA temiz/stabil (chassis 2 doğrulandı, CASE-007 hipotezini güçlendiriyor).** Kabinet1-1'de kullanıcının kendi başına NTP (`ntp server 162.159.200.1`) uyguladığı görüldü; ayrıca bugün ~18:43 civarında açıklanmamış bir coldstart tespit edildi (Omurga'daki tg2/0/10 tek flap olayıyla zaman olarak örtüşüyor). Kabinet2'de geçmişte (tahminen ~12 gün önce) yoğun ama artık aktif olmayan tg0/25 flapping'i bulundu. **Yeni bulgular:** CASE-010 (güvenlik) — Kabinet2/Kabinet3 ve Kabinet1-1/Yonetim_ALT ikişerli gruplar halinde birebir aynı SSH host key'i paylaşıyor, muhtemelen fabrika varsayılanı anahtar; CASE-011 — Kabinet2 ve Yonetim_ALT'ın saati NTP config'i olmadan doğru, sebebi belirsiz (muhtemelen RTC pili farkı). Kullanıcıya üç açık soru soruldu: coldstart sebebi, saat gizemi, host key paylaşımı. |
+| 2026-08-11/12 | Repo git ile versiyonlandı ve GitHub'a (`SeFo19/Ozdoku-Config`, private) push edildi. Push öncesi `usak_topoloji.md` ve `config/Omurga config.txt`'teki düz metin SSH parolaları redakte edildi (repo genelinde grep ile doğrulandı, başka yerde parola kalmadı). |
+| 2026-08-13 | Kabinet1-2'ye ilk kez canlı SSH bağlantısı denendi (saat düzeltmesi talebi üzerine) — bağlantı 3 kez koptu/zaman aşımına uğradı (muhtemelen tg1/0/3'ün o anki aktif flap'i nedeniyle), NTP değişikliği tamamlanamadı. Host key'i Kabinet1-1/Yonetim_ALT ile aynı çıktı (CASE-010'a üçüncü örnek eklendi). |
+| 2026-08-13 | **🚨 Müşteri fiziksel SFP değişimi yaptı:** Omurga tarafında Kabinet3'ün SFP'si değiştirildi (sorun düzelmedi), sonra Kabinet3 tarafında port 25'in SFP'si değiştirilip bağlantı port 26'ya taşındı (~6 dk kesinti sonrası düzeldi). Canlı doğrulama: Kabinet3 tarafı (port 26) artık temiz; ama Omurga tarafında `tg1/0/5` tamamen boşaldı ve bağlantının taşındığı düşünülen `tg1/0/9` portu **aynı kronik flap sorununu göstermeye devam ediyor**. **Sonuç: SFP/port değişimi sorunu çözmedi, Omurga chassis 1 içinde başka bir porta taşıdı** — kök nedenin tek bir SFP/porttan çok, chassis 1'in genelinde veya ortak kullanılan fiber/patch kablosunda olabileceği hipotezi güçlendi. Değişiklik kaydı: `logs/changes/2026-08-13_Kabinet3-Omurga_sfp-degisimi-ve-port-tasima.md`. |
